@@ -20,7 +20,7 @@ os.environ['CUDA_VISION_DEVICES'] = '0'
 project_path = os.getcwd()
 
 classes_num = 45  # 21
-batchsz = 16
+batchsz = 32
 resize = 256
 crop_size = 224
 epochs = 400  # 100
@@ -31,8 +31,8 @@ stop_accuracy = 85
 adjust_lr_epoch = 120  # 60
 
 savefilename = datetime.strftime(datetime.now(), '%Y%m%d_%H%M%S')
-os.mkdir(r'.\run\{}'.format(savefilename))
-img_save_path = str('.\\run\{}\\'.format(savefilename))
+os.mkdir(r'/content/RS-GPU/run/{}'.format(savefilename))
+img_save_path = str('/content/RS-GPU/run/{}/'.format(savefilename))
 
 
 # 训练函数
@@ -74,7 +74,9 @@ def model_train(model, train_data_load, optimizer, loss_func, epoch, log_interva
                 (end - begin)))
 
             global_train_acc.append(acc)
-
+    filename = os.path.join(r'/content/RS-GPU/run/{}'.format(savefilename),
+                                    str(epoch) + str('_{}'.format(correct)) + '.pth')
+    torch.save(model.state_dict(), filename)
 
 def model_test(model, test_data_load, epoch, kk):
     model.eval()
@@ -157,9 +159,9 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std=[0.229, 0.224, 0.225])]))
     train_loader = DataLoader(dataset=train_data, batch_size=batchsz, shuffle=True)
-    test_loader = DataLoader(dataset=test_data, batch_size=batchsz, shuffle=True)
+    #test_loader = DataLoader(dataset=test_data, batch_size=batchsz, shuffle=True)
     train_data_size = len(train_data)
-    valid_data_size = len(test_data)
+    #valid_data_size = len(test_data)
     cudnn.benchmark = True
 
     """加载模型
@@ -186,7 +188,7 @@ if __name__ == '__main__':
         print('----------------------第%s轮----------------------------' % epoch)
         model_train(model, train_loader, optimizer, loss_func, epoch, log_interval)
         torch.cuda.empty_cache()
-        model_test(model, test_loader, epoch, 1)
+        #model_test(model, test_loader, epoch, 1)
         end = time.time()
         time_used = (end - begin) / 60
         print('一轮用时:{}'.format(time_used))
@@ -196,8 +198,8 @@ if __name__ == '__main__':
     print('Train Speed Time:', end_time - start_time)
 
     # 显示训练和测试曲线
-    ratio = int(train_data_size / batchsz / log_interval)
-    show_acc_curv(ratio, 0)
+    #ratio = int(train_data_size / batchsz / log_interval)
+    #show_acc_curv(ratio, 0)
 
     torch.save(model.state_dict(), 'resnet_fs_' + str(1) + '.pth')
 
