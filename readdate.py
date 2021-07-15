@@ -15,8 +15,8 @@ class MyDataset(Dataset):
     def __init__(self, torv="train", transform=None, target_transform=None, loader=MyLoader):
         # rootdir = r'F:\Data\UCMerced_LandUse\images\\'+torv
         # rootdir2 = r'F:\Data\UCMerced_LandUse\labels\\'+torv
-        rootdir = r'D:\NWPU-RESISC45\images\\' + torv
-        rootdir2 = r'D:\NWPU-RESISC45\labels\\' + torv
+        rootdir = r'/content/RS-GPU/NWPU-RESISC45/images/' + torv
+        rootdir2 = r'/content/RS-GPU/NWPU-RESISC45/labels/' + torv
         list = os.listdir(rootdir)  # 列出文件夹下所有的目录与文件
         list2 = os.listdir(rootdir2)  # 列出文件夹下所有的目录与文件
         imgs = []
