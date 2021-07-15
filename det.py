@@ -32,7 +32,7 @@ def main():
     model = models.resnet50(pretrained=True)
     num_features = model.fc.in_features
     model.fc = nn.Linear(num_features, 45)
-    checkpoint = torch.load(r'D:\Project\RS\GRN-SNDL-master\2.pth')
+    checkpoint = torch.load(r'/content/RS-GPU/1.pth')
     # try:
     #     checkpoint.eval()
     # except AttributeError as error:
