@@ -74,39 +74,36 @@ def model_train(model, train_data_load, optimizer, loss_func, epoch, log_interva
                 (end - begin)))
 
             global_train_acc.append(acc)
-    filename = os.path.join(r'/content/RS-GPU/run/{}'.format(savefilename),
-                                    str(epoch) + str('_{}'.format(correct)) + '.pth')
-    torch.save(model.state_dict(), filename)
 
 def model_test(model, test_data_load, epoch, kk):
     model.eval()
-    with torch.no_grad():
+    #with torch.no_grad():
 
-        correct = 0
-        total = len(test_data_load.dataset)
+    correct = 0
+    total = len(test_data_load.dataset)
 
-        for i, (img, label) in enumerate(test_data_load):
-            img, label = img.cuda(), label.cuda()
+    for i, (img, label) in enumerate(test_data_load):
+        img, label = img.cuda(), label.cuda()
 
-            outputs = model(img)
-            _, pre = torch.max(outputs.data, 1)
-            correct += (pre == label).sum()
+        outputs = model(img)
+        _, pre = torch.max(outputs.data, 1)
+        correct += (pre == label).sum()
 
-        acc = correct.item() * 100. / (len(test_data_load.dataset))
-        # 记录最佳分类精度
-        global best_acc, best_epoch
-        if acc > best_acc:
-            best_acc = acc
-            best_epoch = epoch
+    acc = correct.item() * 100. / (len(test_data_load.dataset))
+    # 记录最佳分类精度
+    global best_acc, best_epoch
+    if acc > best_acc:
+        best_acc = acc
+        best_epoch = epoch
 
-        print('Test Set: Accuracy: {}/{}, ({:.6f}%)\nBest_Acc: {}(Epoch:{})'.format(correct, total, acc, best_acc,
-                                                                                    best_epoch))
-        global_test_acc.append(acc)
-        if acc > stop_accuracy:
-            filename = os.path.join(r'.\run\{}'.format(savefilename),
-                                    str(epoch) + str('_{}'.format(acc)) + '.pth')
-            # torch.save(model.state_dict(), str(kk + 1) + '_ResNet34_BestScore_' + str(best_acc) + '.pth')
-            torch.save(model.state_dict(), filename)
+    print('Test Set: Accuracy: {}/{}, ({:.6f}%)\nBest_Acc: {}(Epoch:{})'.format(correct, total, acc, best_acc,
+                                                                                best_epoch))
+    global_test_acc.append(acc)
+    if acc > stop_accuracy:
+        filename = os.path.join(r'.\run\{}'.format(savefilename),
+                                str(epoch) + str('_{}'.format(acc)) + '.pth')
+        # torch.save(model.state_dict(), str(kk + 1) + '_ResNet34_BestScore_' + str(best_acc) + '.pth')
+        torch.save(model.state_dict(), filename)
 
 
 def show_acc_curv(ratio, kk):
@@ -159,9 +156,9 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std=[0.229, 0.224, 0.225])]))
     train_loader = DataLoader(dataset=train_data, batch_size=batchsz, shuffle=True)
-    #test_loader = DataLoader(dataset=test_data, batch_size=batchsz, shuffle=True)
+    test_loader = DataLoader(dataset=test_data, batch_size=batchsz, shuffle=True)
     train_data_size = len(train_data)
-    #valid_data_size = len(test_data)
+    valid_data_size = len(test_data)
     cudnn.benchmark = True
 
     """加载模型
@@ -188,7 +185,7 @@ if __name__ == '__main__':
         print('----------------------第%s轮----------------------------' % epoch)
         model_train(model, train_loader, optimizer, loss_func, epoch, log_interval)
         torch.cuda.empty_cache()
-        #model_test(model, test_loader, epoch, 1)
+        model_test(model, test_loader, epoch, 1)
         end = time.time()
         time_used = (end - begin) / 60
         print('一轮用时:{}'.format(time_used))
